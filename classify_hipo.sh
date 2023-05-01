@@ -33,7 +33,7 @@ if [ "$#" -lt 2 ]; then
   echo ""
   echo "Description: "
   echo "  This script takes a hipo file as input and passes it through a CLAS12ROOT+PYROOT pipeline to perform photon classification."
-  echo "  [.hipo file] --> hipo2tree.C --> [.root file w/ EventTree] --> EventTree2MLinput.C --> [.root file w/ MLinput TTree] --> predict.py --> [p_gamma classifier branch in EventTree] --> buildDiphotons.C --> [diphoton TTree created in .root file]"
+  echo -e "\t[.hipo file] --> hipo2tree.C --> \n\t[.root file w/ EventTree] --> EventTree2MLinput.C --> \n\t[.root file w/ MLinput TTree] --> predict.py --> \n\t[p_gamma classifier branch in EventTree] --> buildDiphotons.C --> [diphoton TTree created in .root file]"
   echo ""
   echo "Arguments: "
   echo "  [.hipo file] --> absolute/relative path to a single .hipo file (ex: fall2018_rga_inbending_nSidis/nSidis_005032.hipo)"
