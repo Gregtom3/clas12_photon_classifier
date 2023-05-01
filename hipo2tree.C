@@ -3,8 +3,12 @@
 #include "src/CutManager.C"
 #include "src/Constants.h"
 
-int hipo2tree(const char * input_hipo_file = "",
-              const char * output_root_file = ""){
+int find_mc_match(std::vector<part> rec_parts, part mc_part);
+
+//int hipo2tree(const char * input_hipo_file = "",
+//              const char * output_root_file = ""){
+int hipo2tree(const char * input_hipo_file = "mc_rga_inbending/45nA_job_3051_0.hipo",
+              const char * output_root_file = "mc_3051_0_test.root"){
   
   // Open TTree and declare branches
   // -------------------------------------
@@ -16,7 +20,7 @@ int hipo2tree(const char * input_hipo_file = "",
   int torus = 0;
   float beamE = 0; // To be set in event loop
   double x,Q2,y,W,s;
-  int pindex[Nmax], status[Nmax], pid[Nmax];
+  int pindex[Nmax], status[Nmax], pid[Nmax], truepid[Nmax],trueparentpid[Nmax],trueparentid[Nmax];
   double px[Nmax], py[Nmax], pz[Nmax], p[Nmax], E[Nmax], m[Nmax], vz[Nmax], beta[Nmax],chi2[Nmax];
   double theta[Nmax], phi[Nmax];
     
@@ -42,6 +46,9 @@ int hipo2tree(const char * input_hipo_file = "",
   tree->Branch("E", E, "E[Nmax]/D");
   tree->Branch("m", m, "m[Nmax]/D");
   tree->Branch("pid", pid, "pid[Nmax]/I");
+  tree->Branch("truepid", truepid, "truepid[Nmax]/I");
+  tree->Branch("trueparentpid", trueparentpid, "trueparentpid[Nmax]/I");
+  tree->Branch("trueparentid", trueparentid, "trueparentid[Nmax]/I");
   tree->Branch("theta", theta, "theta[Nmax]/D");
   tree->Branch("phi", phi, "phi[Nmax]/D");
     
@@ -122,7 +129,9 @@ int hipo2tree(const char * input_hipo_file = "",
   // -------------------------------------
   int while_loop_index = 0;
   int tree_entries = 0;
-  while(_chain.Next()==true){
+  bool is_monte_carlo = false; // Monte Carlo Runs assumed to have RUN::config run==11
+    
+  while(_chain.Next()==true && while_loop_index < 10000){
     if(while_loop_index%10000==0 && while_loop_index!=0){
       std::cout << while_loop_index << " events read | " << tree_entries << " passed cuts (" << tree_entries*100.0/while_loop_index << "%)" << std::endl;
     }
@@ -135,6 +144,7 @@ int hipo2tree(const char * input_hipo_file = "",
     // Important if one wants to define run dependent cuts
     // ----------------------------------------------------
     run = _c12->getBank(_idx_RUNconfig)->getInt(_irun,0);
+    if(run==11) is_monte_carlo=true;
     torus = _c12->getBank(_idx_RUNconfig)->getFloat(_itorus,0);
     
     _cm.set_run(run);
@@ -248,6 +258,35 @@ int hipo2tree(const char * input_hipo_file = "",
     }
     if(num_scattered_e==0 || num_gamma<2){ continue; } // Skip events w/o e- or 2+ gammas
     
+    // Loop over all Monte Carlo particles
+    // -------------------------------------
+    if(is_monte_carlo){
+        auto mcparticles=_c12->mcparts();
+        for(int idx = 0 ; idx < mcparticles->getRows(); idx++){
+            if(mcparticles->getType(idx)!=1) // Reject non-final state
+                {continue;} 
+            part mcpartstruct;
+            mcpartstruct.truepid = mcparticles->getPid(idx);
+            mcpartstruct.px = mcparticles->getPx(idx);
+            mcpartstruct.py = mcparticles->getPy(idx);
+            mcpartstruct.pz = mcparticles->getPz(idx);
+            mcpartstruct.m = mcparticles->getMass(idx);
+            mcpartstruct.E = sqrt( pow(mcpartstruct.px,2) + pow(mcpartstruct.py,2) + pow(mcpartstruct.pz,2) + pow(mcpartstruct.m,2) ); 
+            mcpartstruct.theta = abs(atan(sqrt(pow(mcpartstruct.px,2)+pow(mcpartstruct.py,2))/mcpartstruct.pz));
+            mcpartstruct.phi = atan2(mcpartstruct.py,mcpartstruct.px);
+            mcpartstruct.trueparentid = mcparticles->getParent(idx)-1;
+            mcpartstruct.trueparentpid = mcparticles->getPid(mcpartstruct.trueparentid);
+            
+            // Does this Monte Carlo particle's final state kinematics match with a reconstructed particle?
+            int irecpart = find_mc_match(vec_particles, mcpartstruct);
+            if(irecpart==-1) continue; // No match found
+            
+            // If it does match, then save some Monte Carlo info
+            vec_particles.at(irecpart).truepid=mcpartstruct.truepid;
+            vec_particles.at(irecpart).trueparentpid=mcpartstruct.trueparentpid;
+            vec_particles.at(irecpart).trueparentid=mcpartstruct.trueparentid;
+        }
+    }
       
     // Loop over all particles and fill variables for the TTree
     // --------------------------------------------------------
@@ -263,6 +302,9 @@ int hipo2tree(const char * input_hipo_file = "",
       p[i] = par.p;
       E[i] = par.E;
       pid[i] = par.pid;
+      truepid[i] = par.truepid;
+      trueparentpid[i] = par.trueparentpid;
+      trueparentid[i] = par.trueparentid;
       vz[i] = par.vz;
       chi2[i] = par.chi2;
       beta[i] = par.beta;
@@ -312,4 +354,30 @@ int hipo2tree(const char * input_hipo_file = "",
   outfile->Close();
   return 0;
 
+}
+
+
+// Given the list of REC::Particle's, determine if the provided mc_part matches based on certain criteria
+// Return the index of that reconstructed particle
+int find_mc_match(std::vector<part> rec_parts, part mc_part){
+    int ipar=0;
+    for(auto rec_part: rec_parts){
+        double rec_theta = rec_part.theta;
+        double rec_phi = rec_part.phi;
+        double rec_E = rec_part.E;
+        
+        double mc_theta = mc_part.theta;
+        double mc_phi = mc_part.phi;
+        double mc_E = mc_part.E;
+        
+        double dth = abs(rec_theta-mc_theta)*180/3.14159265;
+        double dphi = abs(rec_phi-mc_phi)*180/3.14159265;
+        double dE = abs(rec_E-mc_E);
+        
+        if (dth<2 && (dphi<4 || abs(dphi-2*3.14159265)<4) && dE<1) return ipar;
+        ipar++;
+    }
+    
+    // no match found
+    return -1;
 }

@@ -26,10 +26,10 @@ if [ "$(basename $(pwd))" != "clas12_photon_classifier" ]; then
 fi
 
 # Check if the number of arguments is less than 2
-if [ "$#" -lt 2 ]; then
+if [ "$#" -lt 3 ]; then
   # Print usage statement and available model options
   echo "Usage: "
-  echo "  ./classify_hipo.sh [.hipo file] [model_name]"
+  echo "  ./classify_hipo.sh [.hipo file] [model_name] [outdir]"
   echo ""
   echo "Description: "
   echo "  This script takes a hipo file as input and passes it through a CLAS12ROOT+PYROOT pipeline to perform photon classification."
@@ -42,6 +42,7 @@ if [ "$#" -lt 2 ]; then
   do
     echo "                   - $(basename $model_path)"
   done
+  echo "  [outdir] --> Location to save root files"
   # Exit the script
   exit
 fi
@@ -49,8 +50,8 @@ fi
 
 # Get the input file and model paths
 hipo_file=$1
-model=trained_models/$2
-
+model=pretrained_models/$2
+outdir=$3
 # Check if the input .hipo file exists
 if ! test -f "$hipo_file"; then
   print_red "Error: Input .hipo file does not exist"
@@ -67,7 +68,7 @@ fi
 print_green "Input .hipo file and selected model exist"
 
 # Create the output .root file path
-outroot=outroot/$(basename "$hipo_file" .hipo).root
+outroot=$outdir/$(basename "$hipo_file" .hipo).root
 
 ################################################################################
 # Run hipo2tree.C on hipo file

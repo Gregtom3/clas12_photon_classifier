@@ -16,7 +16,7 @@ def predict(rootfile="",
     model.load_model(model_path)
 
     # Load MLInput data
-    X=load_data(rootfiles=[rootfile])
+    X=load_data(rootfiles=[rootfile], version="predict")
 
     # No data was successfully loaded
     # We return -1 when data loading fails

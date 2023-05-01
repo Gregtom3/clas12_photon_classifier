@@ -10,6 +10,9 @@ struct part{
   double theta=-999;
   double phi=-999;
   int pid=-999;
+  int truepid=-999; // Monte Carlo
+  int trueparentpid=-999; // Monte Carlo
+  int trueparentid=-999;  // Monte Carlo
   double vz=-999;
   double chi2=-999;
   double beta=-999;

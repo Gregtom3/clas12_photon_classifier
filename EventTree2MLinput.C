@@ -1,4 +1,5 @@
-int EventTree2MLinput(const char * input_file = ""){
+//int EventTree2MLinput(const char * input_file = ""){
+int EventTree2MLinput(const char * input_file = "mc_3051_0_test.root"){
     
     //Define the variables "m_g" , "m_ch" , "m_nh" 
     //Should not be changed because the model was trained with this specific set of inputs
@@ -20,6 +21,7 @@ int EventTree2MLinput(const char * input_file = ""){
 
     //Define the branches in MLInput: POI (photon-of-interest)
     //                                Nearest neighbor gammas, charged hadrons, neutral hadrons, electron
+    int photon_has_match = 0; // 0 if bkg, 1 if signal
     double gE=0; // Photon energy
     double gEpcal=0; // Photon pcal energy
     double gTheta=0; // Photon angle
@@ -51,7 +53,8 @@ int EventTree2MLinput(const char * input_file = ""){
     
     
     // Place TTree Branches
-    
+    MLInput->Branch("photon_has_match",&photon_has_match,"photon_has_match/I");
+
     MLInput->Branch("m_g",&m_g,"m_g/I");
     MLInput->Branch("m_ch",&m_ch,"m_ch/I");
     MLInput->Branch("m_nh",&m_nh,"m_nh/I");
@@ -91,7 +94,7 @@ int EventTree2MLinput(const char * input_file = ""){
     const int kNmax = 500;
     int Nmax;
     double E[kNmax], th[kNmax], phi[kNmax], pcal_e[kNmax], pcal_m2u[kNmax], pcal_m2v[kNmax];
-    int pid[kNmax];
+    int pid[kNmax], truepid[kNmax];
     double pcal_x[kNmax],pcal_y[kNmax],pcal_z[kNmax];
     double ecin_x[kNmax],ecin_y[kNmax],ecin_z[kNmax];
     double ecout_x[kNmax],ecout_y[kNmax],ecout_z[kNmax];
@@ -102,6 +105,7 @@ int EventTree2MLinput(const char * input_file = ""){
     EventTree->SetBranchAddress("phi", phi);
     EventTree->SetBranchAddress("theta", th);
     EventTree->SetBranchAddress("pid", pid);
+    EventTree->SetBranchAddress("truepid", truepid);
     EventTree->SetBranchAddress("pcal_x",pcal_x);
     EventTree->SetBranchAddress("pcal_y",pcal_y);
     EventTree->SetBranchAddress("pcal_z",pcal_z);
@@ -153,11 +157,12 @@ int EventTree2MLinput(const char * input_file = ""){
           num_photons_0_35 = 0;
         
           // Set vars
-          gE = E[ipart];
+	  gE = E[ipart];
           gEpcal = pcal_e[ipart];
           gTheta = th[ipart];
           gm2u = pcal_m2u[ipart];
           gm2v = pcal_m2v[ipart];
+	  photon_has_match = (truepid[ipart]==22); // truepid[ipart]=-999 if no mc match found 
           //Loop over the particles in the event
           for (int jpart=0; jpart<Nmax; ++jpart) {
 
