@@ -5,10 +5,8 @@
 
 int find_mc_match(std::vector<part> rec_parts, part mc_part);
 
-//int hipo2tree(const char * input_hipo_file = "",
-//              const char * output_root_file = ""){
-int hipo2tree(const char * input_hipo_file = "mc_rga_inbending/45nA_job_3051_0.hipo",
-              const char * output_root_file = "mc_3051_0_test.root"){
+int hipo2tree(const char * input_hipo_file = "",
+              const char * output_root_file = ""){
   
   // Open TTree and declare branches
   // -------------------------------------
@@ -131,7 +129,7 @@ int hipo2tree(const char * input_hipo_file = "mc_rga_inbending/45nA_job_3051_0.h
   int tree_entries = 0;
   bool is_monte_carlo = false; // Monte Carlo Runs assumed to have RUN::config run==11
     
-  while(_chain.Next()==true && while_loop_index < 10000){
+  while(_chain.Next()==true){
     if(while_loop_index%10000==0 && while_loop_index!=0){
       std::cout << while_loop_index << " events read | " << tree_entries << " passed cuts (" << tree_entries*100.0/while_loop_index << "%)" << std::endl;
     }

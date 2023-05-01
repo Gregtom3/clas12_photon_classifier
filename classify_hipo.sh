@@ -38,11 +38,11 @@ if [ "$#" -lt 3 ]; then
   echo "Arguments: "
   echo "  [.hipo file] --> absolute/relative path to a single .hipo file (ex: fall2018_rga_inbending_nSidis/nSidis_005032.hipo)"
   echo "  [model_name] --> Which model to use for photon classification. Available options are:"
-  for model_path in trained_models/*
+  for model_path in pretrained_models/*
   do
-    echo "                   - $(basename $model_path)"
+    echo "                   - pretrained_models/$(basename $model_path)"
   done
-  echo "  [outdir] --> Location to save root files"
+  echo "  [outdir] --> Location to save root files (ex: outroot)"
   # Exit the script
   exit
 fi
@@ -50,7 +50,7 @@ fi
 
 # Get the input file and model paths
 hipo_file=$1
-model=pretrained_models/$2
+model=$2
 outdir=$3
 # Check if the input .hipo file exists
 if ! test -f "$hipo_file"; then
@@ -85,7 +85,7 @@ print_green "Root file $outroot created containing TTree \"EventTree\")"
 ################################################################################
 
 echo $hl
-print_green "Running EventTree2MLinput.C on $outroot)"
+print_green "Running EventTree2MLinput.C on $outroot"
 clas12root -b -q ./EventTree2MLinput.C\(\"${outroot}\"\)
 print_green "New TTree \"MLinput\" created in $outroot"
 
