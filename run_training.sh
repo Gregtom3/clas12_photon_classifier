@@ -33,13 +33,6 @@ while read hipo_file; do
     print_green "Processed $count/$total files"
 done < "$project_directory/training_hipo_files.txt"
 
-print_green "Loading modules..."
-source /etc/profile.d/modules.sh
-module unload python
-module unload root
-module load python3/3.9.7
-module load root
-
 print_green "Training model..."
 /apps/python3/3.9.7/bin/python3 train.py $project_directory
 
@@ -50,8 +43,6 @@ for file in "$project_directory/data"/*; do
 done
 
 print_green "Processing Diphotons..."
-module unload root
-module load clas12/pro
 
 for file in "$project_directory/data"/*; do
     print_green "Processing Diphotons for file: $file"

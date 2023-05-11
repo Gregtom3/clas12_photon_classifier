@@ -95,19 +95,8 @@ print_green "New TTree \"MLinput\" created in $outroot"
 
 echo $hl
 print_green "Running predict.py on $outroot using model $model"
-echo -e "\t Unloading modules root, python"
-source /etc/profile.d/modules.sh
-module unload root
-module unload python
-echo -e "\t Loading python3/3.9.7 and latest root module"
-module load python3/3.9.7
-module load root
 /apps/python3/3.9.7/bin/python3 predict.py $outroot $model
 print_green "Prediction done. New photon classification branch \"p_gamma\" stored in EventTree for $outroot"
-echo -e "Unloading root module"
-module unload root
-echo -e "Reloading clas12/pro"
-module load clas12/pro
 
 
 ################################################################################

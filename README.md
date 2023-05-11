@@ -14,7 +14,7 @@ The following python packages must be installed under python3.9.7. To prepare th
 
   1. module unload python
   2. module load python3/3.9.7
-  3. pip3 install copy, pyroot, catboost, os, numpy, array, sys, uproot4, pandas, scikit-learn, matplotlib, seaborn, tqdm
+  3. pip3 install copy, pyroot, catboost, os, numpy, array, sys, uproot4, pandas, scikit-learn, matplotlib, seaborn, tqdm, pyyaml
   
 ### Predicting with pre-trained models
 
