@@ -1,5 +1,5 @@
 # CLAS12 Photon Classification
-This repository contains scripts and code to perform photon classification on data files from the CLAS12 experiment at Jefferson Lab.
+This repository contains code to perform photon classification on data files from the CLAS12 experiment at Jefferson Lab.
 
 Pretrained Gradient Boosted Trees (see https://catboost.ai/en/docs/) models are provided using 10.6 GeV inbending (45nA bkg), and 10.6 GeV outbending (50nA bkg) clasdis Monte Carlo. Users can also train their own models, which may need to be done if the default cuts included in this repository are loosened/tweaked. 
 
