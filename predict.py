@@ -7,7 +7,8 @@ from src.dataloader import *
 from catboost import CatBoostClassifier
 
 def predict(rootfile="",
-            model_path=""):
+            model_path="",
+            tree_name="EventTree"):
     
     # Create a CatBoostClassifier object
     model = CatBoostClassifier()
@@ -30,7 +31,7 @@ def predict(rootfile="",
     # Load EventTree
     # Here we will create a new weights branch so that the photon-per-photon classification can be stored
     tfile = ROOT.TFile(rootfile, "UPDATE")
-    tree = tfile.Get("EventTree")
+    tree = tfile.Get(tree_name)
 
     # create a new branch for the tree
     weights = array.array('d',100*[0.0])
@@ -53,7 +54,7 @@ def predict(rootfile="",
         weight_branch.Fill() # Fill the branch
 
     # Write the TTree and close the TFile
-    tree.Write("EventTree",1) # the "1" forces an overwrite of the previous ttree
+    tree.Write(tree_name,1) # the "1" forces an overwrite of the previous ttree
     tfile.Close()
         
 if __name__ == "__main__":
