@@ -463,7 +463,7 @@ int hipo2tree(const char * input_hipo_file = "",
           // Set vars
 	  gE = E[ipart];
           gEpcal = pcal_e[ipart];
-          gTheta = th[ipart];
+          gTheta = theta[ipart];
           gm2u = pcal_m2u[ipart];
           gm2v = pcal_m2v[ipart];
 	  photon_has_match = (truepid[ipart]==22); // truepid[ipart]=-999 if no mc match found 
