@@ -93,7 +93,7 @@ int hipo2tree(const char * input_hipo_file = "",
   int m_nh = 2; // Number of neighboring neutral hadrons (neutrons)
     
   
-    TTree *MLInput = new TTree("MLInput","Nearest neighbor information");
+    TTree *MLInput = new TTree("MLinput","Nearest neighbor information");
 
     //Define the branches in MLInput: POI (photon-of-interest)
     //                                Nearest neighbor gammas, charged hadrons, neutral hadrons, electron
