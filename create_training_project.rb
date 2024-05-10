@@ -71,7 +71,8 @@ puts "How many files do you want to analyze?"
 num_files = gets.chomp.to_i
 
 # Prepare the base of the project directory
-base_directory = "training_projects/#{run_group}_#{bending}_#{pass}_version"
+base_subdirectory = "#{run_group}_#{bending}_#{pass}_version"
+base_directory = "training_projects/#{base_subdirectory}"
 version = 0
 
 # Construct the initial project directory name
@@ -104,7 +105,6 @@ puts "========================================================================\n
 puts "TO DO\n"
 puts "\n========================================================================\n"
 puts "1. Within #{project_directory} edit the \"model_params.yaml\" file to manually edit the CatBoost training model parameters (see https://catboost.ai/en/docs/references/training-parameters/)\n"
-puts "2. After the above two are edited, run [./run_training.sh #{project_directory} [0 or 1]]"
-puts "    Option 0 --> Run in 'fast' mode. Does not save EventTree, and thus is used when we only want to produce trained models."
-puts "    Option 1 --> Run in 'normal' mode. Should be used if you'd like to save the EventTree to do predictions on the trained Monte Carlo."
+puts "2. After the above two are edited, run [./run_training.rb --project_name #{base_subdirectory}#{version}_#{timestamp}"
+puts "    Preview options with --help."
 puts "\n========================================================================\n"
