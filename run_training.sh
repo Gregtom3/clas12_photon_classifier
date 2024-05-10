@@ -16,8 +16,9 @@ if [ -z "$1" ]; then
 fi
 
 project_name="$1"
-project_directory="training_projects/$project_name"
+project_directory="$project_name"
 
+save_EventTree=$2
 # Read input files from training_hipo_files.txt
 count=0
 total=$(wc -l < "$project_directory/training_hipo_files.txt")
@@ -27,8 +28,8 @@ while read hipo_file; do
     outroot="$project_directory/data/$(basename "$hipo_file" .hipo).root"
     
     # Convert hipo to root using clas12root
-    clas12root -b -q ./hipo2tree.C\(\"${hipo_file}\",\"${outroot}\"\)
-    clas12root -b -q ./EventTree2MLinput.C\(\"${outroot}\"\)
+    clas12root -b -q ./hipo2tree.C\(\"${hipo_file}\",\"${outroot}\",${save_EventTree}\)
+    # clas12root -b -q ./EventTree2MLinput.C\(\"${outroot}\"\)
     
     print_green "Processed $count/$total files"
 done < "$project_directory/training_hipo_files.txt"
