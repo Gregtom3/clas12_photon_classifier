@@ -93,9 +93,17 @@ end
 # Create the project directory
 FileUtils.mkdir_p(project_directory)
 FileUtils.mkdir_p("#{project_directory}/data")
+FileUtils.mkdir_p("#{project_directory}/model")
 # Write the selected hipo files to a configuration file
 File.open("#{project_directory}/training_hipo_files.txt", 'w') do |file|
     hipo_files.first(num_files).each { |file_path| file.puts file_path }
+end
+
+File.open("#{project_directory}/model_params.yaml", "w") do |file|
+  file.puts "learning_rate: 0.1"
+  file.puts "depth: 5"
+  file.puts "iterations: 100"
+  file.puts "min_data_in_leaf: 5"
 end
 
 puts "Project setup complete. Directory: #{project_directory}"
@@ -105,6 +113,8 @@ puts "========================================================================\n
 puts "TO DO\n"
 puts "\n========================================================================\n"
 puts "1. Within #{project_directory} edit the \"model_params.yaml\" file to manually edit the CatBoost training model parameters (see https://catboost.ai/en/docs/references/training-parameters/)\n"
-puts "2. After the above two are edited, run [./run_training.rb --project_name #{base_subdirectory}#{version}_#{timestamp}"
+puts "2. After the above two are edited, run [./run_training.rb --project_name #{base_subdirectory}#{version}_#{timestamp}]"
 puts "    Preview options with --help."
+puts "    If you intend to send batches with slurm...run..."
+puts "        ./run_training.rb --project_name #{base_subdirectory}#{version}_#{timestamp} --fast --slurm"
 puts "\n========================================================================\n"

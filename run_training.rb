@@ -30,6 +30,27 @@ def create_slurm_file(command, project_directory, job_name)
   slurm_file
 end
 
+def create_gpu_slurm_file(command, project_directory, job_name)
+  slurm_template = <<-SLURM
+#!/bin/bash
+#SBATCH --account=clas12
+#SBATCH --partition=gpu
+#SBATCH --mem-per-cpu=4000
+#SBATCH --job-name=#{job_name}
+#SBATCH --cpus-per-task=16
+#SBATCH --gres=gpu:TitanRTX:1
+#SBATCH --time=24:00:00
+#SBATCH --output=#{project_directory}/slurm/#{job_name}.out
+#SBATCH --error=#{project_directory}/slurm/#{job_name}.err
+
+#{command}
+  SLURM
+
+  slurm_file = "#{project_directory}/slurm/#{job_name}.slurm"
+  File.open(slurm_file, "w") { |file| file.write(slurm_template) }
+  slurm_file
+end
+
 options = {}
 OptionParser.new do |opts|
   opts.banner = "Usage: run_training.rb [options]"
@@ -98,7 +119,7 @@ end
 
 if use_slurm
   # Create SLURM file for training with dependency on hipo2tree jobs
-  slurm_file = create_slurm_file("/apps/python3/3.9.7/bin/python3 train.py #{project_directory}", project_directory, "train_model")
+  slurm_file = create_gpu_slurm_file("/apps/python3/3.9.7/bin/python3 train.py #{project_directory}", project_directory, "train_model")
   dependency = job_ids.empty? ? "" : "--dependency=afterok:#{job_ids.join(',')}"
   # Submit SLURM job for training with dependency on hipo2tree jobs
   system("sbatch #{dependency} #{slurm_file}")
