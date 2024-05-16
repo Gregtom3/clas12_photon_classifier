@@ -47,82 +47,51 @@ def get_keys(u):
 
 # Creates dataset for training or evaluation
 # This function reads in root files, extracts the TTree and converts it into a dataframe, then splits the data into a training and validation set according to the given split ratio and random seed. The output is four objects, X_train, X_validation, y_train, y_validation containing the training and validation features and labels, respectively.
-def load_data(rootfiles=[""],
-              version="train",
-              split_ratio = 0.75,
-              random_seed = 42):
-    
+
+def load_data(rootfiles=[""], version="train", split_ratio=0.75, random_seed=42):
     ttree = "MLinput" 
-    assert(version=="train" or version=="predict")
+    assert(version in ["train", "predict"])
     
-    if(type(rootfiles)!=list):
-        rootfiles=[rootfiles]
+    if not isinstance(rootfiles, list):
+        rootfiles = [rootfiles]
         print("WARNING: Need to convert <rootfiles> to list")
     
-    df=pd.DataFrame()
+    data_list = []
+    
     # Loop over rootfiles
-    if(version=="train"):
-        enu=enumerate(tqdm(rootfiles))
-    else:
-        enu=enumerate(rootfiles)
-
-    for ifile,rootfile in enu:
-        
+    for ifile, rootfile in enumerate(rootfiles):
         # Open the file in uproot
-        u = uproot.open(rootfile)
-        found=False
-        for key in u.keys():
-            if(ttree in key):
-                found=True
-                break
-        
-        if(not found):
-            print("Skipping file",rootfile,"...missing TTree=",ttree)
-            continue
-            
         try:
-            u = u[ttree]
+            u = uproot.open(rootfile)
+            tree = u[ttree]
+        except KeyError:
+            print(f"Skipping file {rootfile}...missing TTree={ttree}")
+            continue
         except:
-            print("Skipping file",rootfile,"...missing TTree=",ttree)
-            continue
-        # If the TTree is empty, continue
-        if(u.num_entries==0):
+            print(f"Skipping file {rootfile}...unexpected error with TTree={ttree}")
             continue
 
+        if tree.num_entries == 0:
+            continue
+        
         # Get dataframe params
-        
-        branchnames,keys,nns = get_keys(u)
-        if(ifile==0): 
-            # Create dataframe from first file
-            # This dataframe will be appended to for each file
-            df = pd.DataFrame(columns=keys)
-        
-        # Create temporary dataframe for each file
-        tmp_df = pd.DataFrame(columns=keys)
-        
-        # Fill temporary dataframe
-        for b,k,n in zip(branchnames,keys,nns):
-            if(n==-1):
-                tmp_df[k]=u[b].array(library="np")
-            else:
-                tmp_df[k]=np.array(u[b].array(library="ak")[:,n],dtype=float)
-                
-        # Concatenate with main dataframe
-        df=pd.concat([df,tmp_df], ignore_index=True,axis=0)
-
-        # Delete temporary dataframe
-        del tmp_df
-
-    # If the dataframe is empty, return -1
-    if(df.empty):
+        branchnames, keys, nns = get_keys(tree)
+        arrays = tree.arrays(branchnames, library="ak")
+        # Convert awkward arrays to pandas DataFrame directly
+        tmp_df = pd.DataFrame({k: (np.array(arrays[b]) if n == -1 else np.array(arrays[b][:, n], dtype=np.float32)) for b, k, n in zip(branchnames, keys, nns)})
+        data_list.append(tmp_df)
+    # Concatenate all DataFrames in the list
+    if not data_list:
         return -1
-
+    
+    df = pd.concat(data_list, ignore_index=True)
     # Create dataset for training/evaluation
-    X = df.drop("photon_has_match",axis=1)
-    if(version=="predict"):
+    X = df.drop("photon_has_match", axis=1)
+    
+    if version == "predict":
         return X
     else:
-        y=df["photon_has_match"]
+        y = df["photon_has_match"]
         X_train, X_validation, y_train, y_validation = train_test_split(X, y, train_size=split_ratio, random_state=random_seed)
         return [X_train, y_train], [X_validation, y_validation]
     

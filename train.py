@@ -12,42 +12,53 @@ def train(projectdir = ""):
     if(not os.path.exists(yamlfile)):
         print("YAML file",yamlfile,"not found...Aborting...")
         return -1
-   
+    
+    # Path to the save CatBoostModel
+    model_path = projectdir+"/model/catboost_model"
+    
+    # Parameters for the model (ex: tree depth)
     model_params = load_params(yamlfile)
+    
+    
+    # Create CatBoost Model
+    model = CatBoostClassifier(**model_params,
+                    custom_loss=[metrics.Accuracy()], 
+                    random_seed=42,
+                    #task_type="GPU",
+                    #devices='0:1')
+                    task_type="CPU")
     
     # Load the rootfiles for the learning
     rootfiles = load_files(projectdir)
     print(len(rootfiles),"found for training")
     
     # Load in data into a training and validation sample
-    print("Loading data for",len(rootfiles),"root files")
-    train_pool, validation_pool = load_data(rootfiles = rootfiles,
-                                            version="train",
-                                            split_ratio = 0.75,
-                                            random_seed = 42)
-    
+    Nfiles = len(rootfiles)
+    for iroot,rootfile in enumerate(rootfiles):
+        
 
-    X_train = train_pool[0]
-    y_train = train_pool[1]
-    X_validation = validation_pool[0]
-    y_validation = validation_pool[1]
+        
+        print("Loading data for file <"+rootfile+"> ("+str(iroot+1)+"/"+str(Nfiles)+")")
+        train_pool, validation_pool = load_data(rootfiles = [rootfile],
+                                                version="train",
+                                                split_ratio = 0.75,
+                                                random_seed = 42)
     
-    numeric_train_pool = Pool(X_train, y_train)
-    numeric_val_pool = Pool(X_validation, y_validation)
-    
-    # Create CatBoost Model
-    model = CatBoostClassifier(**model_params,
-                            custom_loss=[metrics.Accuracy()], 
-                            random_seed=42,
-                            #task_type="CPU"
-                            task_type="CPU")
-                            #devices='0:1')
-
-    # Perform the training
-    print("Starting training")
-    model.fit(numeric_train_pool, verbose=1,eval_set=numeric_val_pool)
-    
-    model.save_model(projectdir+"/model/catboost_model")
+        print("\t Starting training for file <"+rootfile+">")
+        X_train = train_pool[0]
+        y_train = train_pool[1]
+        X_validation = validation_pool[0]
+        y_validation = validation_pool[1]
+        numeric_train_pool = Pool(X_train, y_train)
+        numeric_val_pool = Pool(X_validation, y_validation)
+        
+        # Perform the training
+        if iroot==0:
+            model.fit(numeric_train_pool, verbose=1,eval_set=numeric_val_pool,early_stopping_rounds=50)
+        else:
+            model.fit(numeric_train_pool, verbose=1,eval_set=numeric_val_pool,early_stopping_rounds=50,init_model=model_path)
+                
+        model.save_model(projectdir+"/model/catboost_model")
 
     #Import the model and perform predictions with the validation set
     trained_model = CatBoostClassifier()
