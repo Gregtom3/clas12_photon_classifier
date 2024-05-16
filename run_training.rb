@@ -80,7 +80,7 @@ end
 
 project_name = options[:project_name]
 project_directory = project_name
-save_EventTree = options[:mode] == :fast ? "1" : "0"
+save_EventTree = options[:mode] == :fast ? "0" : "1"
 use_slurm = options[:slurm]
 
 if use_slurm

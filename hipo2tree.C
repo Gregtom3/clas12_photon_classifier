@@ -265,13 +265,14 @@ int hipo2tree(const char * input_hipo_file = "",
       partstruct.E = sqrt(partstruct.p*partstruct.p+partstruct.m*partstruct.m);
     
       // Ensure hadrons are not in CD
-      if (partstruct.pid == 2212 || partstruct.pid == -2212 ||
-	  partstruct.pid == 2112 ||
-	  partstruct.pid == -321 || partstruct.pid == -211 ||
-	  partstruct.pid == 211 || partstruct.pid == 321) {
-	if(partstruct.status>=4000 && partstruct.status<5000)
-	  continue;
-      }
+      // As of 5/16/2024 we are training the models without this cut
+//       if (partstruct.pid == 2212 || partstruct.pid == -2212 ||
+// 	  partstruct.pid == 2112 ||
+// 	  partstruct.pid == -321 || partstruct.pid == -211 ||
+// 	  partstruct.pid == 211 || partstruct.pid == 321) {
+// 	if(partstruct.status>=4000 && partstruct.status<5000)
+// 	  continue;
+//       }
         
       // Add particle to the list
       _hipoInterface.loadBankData(_c12,partstruct);
@@ -314,7 +315,8 @@ int hipo2tree(const char * input_hipo_file = "",
     
     // Calculate event kinematics
     y = (init_electron.E()-eVector.E())/init_electron.E();
-    if(y>0.8) continue;
+    
+    // if(y>0.8) continue;
     Q2 = abs(qVector.M2());
     W = (qVector+init_target).M();
     x = Q2/s/y;
@@ -325,7 +327,7 @@ int hipo2tree(const char * input_hipo_file = "",
     // 
     // Return a list of filtered particles
     // -------------------------------------------------
-      
+    
     vec_particles = _cm.filter_particles(vec_particles);
       
     // Check list of cut particles to see if event is worth keeping

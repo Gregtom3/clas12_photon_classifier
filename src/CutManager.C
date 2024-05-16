@@ -59,9 +59,9 @@ std::vector<part> CutManager::filter_particles(std::vector<part> particles){
 // Protected member functions
 // Apply all relevant electron cuts
 bool CutManager::apply_electron_cuts(part particle){
-  if(VzCut(particle)==false) return false;
-  if(minEpcal(particle)==false) return false;
-  if(caloEdges(particle)==false) return false;
+  // if(VzCut(particle)==false) return false;
+  // if(minEpcal(particle)==false) return false;
+  // if(caloEdges(particle)==false) return false;
   return true;
 }
 
@@ -70,9 +70,9 @@ bool CutManager::apply_electron_cuts(part particle){
 bool CutManager::apply_photon_cuts(part particle, part electron){
   if(minEpcal(particle)==false) return false;
   if(photonMinEtot(particle)==false) return false;
-  if(photonElectronAngle(particle,electron)==false) return false;
-  if(photonBetaCut(particle)==false) return false;
-  if(caloEdges(particle)==false) return false;
+  // if(photonElectronAngle(particle,electron)==false) return false;
+  // if(photonBetaCut(particle)==false) return false;
+  // if(caloEdges(particle)==false) return false;
   return true;
 }
 
