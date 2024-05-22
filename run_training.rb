@@ -14,7 +14,7 @@ def create_slurm_file(command, project_directory, job_name)
   slurm_template = <<-SLURM
 #!/bin/bash
 #SBATCH --account=clas12
-#SBATCH --partition=scavenger_gpu
+#SBATCH --partition=production
 #SBATCH --mem-per-cpu=4000
 #SBATCH --job-name=#{job_name}
 #SBATCH --cpus-per-task=2
@@ -34,11 +34,10 @@ def create_gpu_slurm_file(command, project_directory, job_name)
   slurm_template = <<-SLURM
 #!/bin/bash
 #SBATCH --account=clas12
-#SBATCH --partition=gpu
+#SBATCH --partition=scavenger_gpu
 #SBATCH --mem-per-cpu=4000
 #SBATCH --job-name=#{job_name}
 #SBATCH --cpus-per-task=16
-#SBATCH --gres=gpu:TitanRTX:1
 #SBATCH --time=24:00:00
 #SBATCH --output=#{project_directory}/slurm/#{job_name}.out
 #SBATCH --error=#{project_directory}/slurm/#{job_name}.err

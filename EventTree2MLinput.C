@@ -176,9 +176,9 @@ int EventTree2MLinput(const char * input_file = "mc_3051_0_test.root"){
             //Declare and set x, y, and z coordinates for each TVector3
             double x1,x2,y1,y2,z1,z2;
             //Check if the particle has values in pcal
-            if(pcal_x[ipart]==-999){
+            if(pcal_x[ipart]==0){
                 //Check if the particle has values in ecin
-                if(ecin_x[ipart]==-999){
+                if(ecin_x[ipart]==0){
                     //If not, set coordinates for v_1 to values in ecout
                     x1=ecout_x[ipart]; 
                     y1=ecout_y[ipart]; 
@@ -198,8 +198,8 @@ int EventTree2MLinput(const char * input_file = "mc_3051_0_test.root"){
                 z1=pcal_z[ipart];  
             }
             //Repeat for jpart
-            if(pcal_x[jpart]==-999){
-                if(ecin_x[jpart]==-999){
+            if(pcal_x[jpart]==0){
+                if(ecin_x[jpart]==0){
                     x2=ecout_x[jpart]; 
                     y2=ecout_y[jpart]; 
                     z2=ecout_z[jpart];

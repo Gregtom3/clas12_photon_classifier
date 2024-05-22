@@ -100,8 +100,8 @@ File.open("#{project_directory}/training_hipo_files.txt", 'w') do |file|
 end
 
 File.open("#{project_directory}/model_params.yaml", "w") do |file|
-  file.puts "learning_rate: 0.01"
-  file.puts "depth: 10"
+  file.puts "learning_rate: 0.2"
+  file.puts "depth: 5"
   file.puts "iterations: 1000"
   file.puts "min_data_in_leaf: 5"
 end

@@ -85,7 +85,7 @@ int hipo2tree(const char * input_hipo_file = "",
   tree->Branch("ecout_m2v", ecout_m2v, "ecout_m2v[Nmax]/D");
   tree->Branch("ecout_m2w", ecout_m2w, "ecout_m2w[Nmax]/D");
     
-    
+
   //Define the variables "m_g" , "m_ch" , "m_nh" 
   //Should not be changed because the model was trained with this specific set of inputs
   int m_g = 3; // Number of neighboring gammas
@@ -173,7 +173,7 @@ int hipo2tree(const char * input_hipo_file = "",
 
   _chain.Add(input_hipo_file);
   _config_c12=_chain.GetC12Reader();
-    
+
   // Configure PIDs for final state
   // -------------------------------------
   _config_c12->addAtLeastPid(11,1); // At least 1 electron
@@ -216,7 +216,7 @@ int hipo2tree(const char * input_hipo_file = "",
       std::cout << while_loop_index << " events read | " << tree_entries << " passed cuts (" << tree_entries*100.0/while_loop_index << "%)" << std::endl;
     }
     while_loop_index++;
-      
+
     // Clear vectors
     vec_particles.clear();
       
@@ -303,6 +303,7 @@ int hipo2tree(const char * input_hipo_file = "",
         continue; // No scattered electron passing the above conditions found
     }
     
+
     // Get the scattered electron
     part scattered_electron = vec_particles[idx_e];
     if((scattered_electron.status <= -3000 || scattered_electron.status > -2000)) continue; // Max E electron has bad status
@@ -482,9 +483,9 @@ int hipo2tree(const char * input_hipo_file = "",
             //Declare and set x, y, and z coordinates for each TVector3
             double x1,x2,y1,y2,z1,z2;
             //Check if the particle has values in pcal
-            if(pcal_x[ipart]==-999){
+            if(pcal_x[ipart]==0){
                 //Check if the particle has values in ecin
-                if(ecin_x[ipart]==-999){
+                if(ecin_x[ipart]==0){
                     //If not, set coordinates for v_1 to values in ecout
                     x1=ecout_x[ipart]; 
                     y1=ecout_y[ipart]; 
@@ -504,8 +505,8 @@ int hipo2tree(const char * input_hipo_file = "",
                 z1=pcal_z[ipart];  
             }
             //Repeat for jpart
-            if(pcal_x[jpart]==-999){
-                if(ecin_x[jpart]==-999){
+            if(pcal_x[jpart]==0){
+                if(ecin_x[jpart]==0){
                     x2=ecout_x[jpart]; 
                     y2=ecout_y[jpart]; 
                     z2=ecout_z[jpart];
