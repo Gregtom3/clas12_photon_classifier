@@ -216,7 +216,6 @@ int hipo2tree(const char * input_hipo_file = "",
       std::cout << while_loop_index << " events read | " << tree_entries << " passed cuts (" << tree_entries*100.0/while_loop_index << "%)" << std::endl;
     }
     while_loop_index++;
-
     // Clear vectors
     vec_particles.clear();
       

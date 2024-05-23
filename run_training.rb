@@ -118,13 +118,13 @@ end
 
 if use_slurm
   # Create SLURM file for training with dependency on hipo2tree jobs
-  slurm_file = create_gpu_slurm_file("/apps/python3/3.9.7/bin/python3 train.py #{project_directory}", project_directory, "train_model")
+  slurm_file = create_gpu_slurm_file("python3 train.py #{project_directory}", project_directory, "train_model")
   dependency = job_ids.empty? ? "" : "--dependency=afterok:#{job_ids.join(',')}"
   # Submit SLURM job for training with dependency on hipo2tree jobs
   system("sbatch #{dependency} #{slurm_file}")
 else
   print_green "Training model..."
-  system("/apps/python3/3.9.7/bin/python3 train.py #{project_directory}")
+  system("/python3 train.py #{project_directory}")
 end
 
 if options[:mode] == :normal

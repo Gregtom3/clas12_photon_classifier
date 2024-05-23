@@ -39,11 +39,13 @@ def train(projectdir = ""):
 
         
         print("Loading data for file <"+rootfile+"> ("+str(iroot+1)+"/"+str(Nfiles)+")")
-        train_pool, validation_pool = load_data(rootfiles = [rootfile],
-                                                version="train",
-                                                split_ratio = 0.75,
-                                                random_seed = 42)
-    
+        try:
+            train_pool, validation_pool = load_data(rootfiles = [rootfile],
+                                                    version="train",
+                                                    split_ratio = 0.75,
+                                                    random_seed = 42)
+        except:
+            continue
         print("\t Starting training for file <"+rootfile+">")
         X_train = train_pool[0]
         y_train = train_pool[1]
